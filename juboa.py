@@ -8,6 +8,8 @@
 
 import subprocess
 
+UPPER_THRESHOLD = 80
+LOWER_THRESHOLD = 30
 APP_NAME = "Juboa"
 AC_ADAPTER_PATH = "/org/freedesktop/UPower/devices/line_power_AC0"
 BATTERY_PATH_LIST = [
@@ -63,5 +65,25 @@ def is_ac_adapter_online():
 
 def get_battery_percentage(battery_path):
     resrult = get_value(get_upower_result(battery_path), "percentage:")
-    battery_percentage = int(resrult.stlip("%"))
+    battery_percentage = int(resrult.strip("%"))
     return battery_percentage
+
+def get_average_battery_percentage():
+    sum_battery_percentage = 0
+    for path in BATTERY_PATH_LIST:
+        sum_battery_percentage += get_battery_percentage(path)
+    average = sum_battery_percentage / len(BATTERY_PATH_LIST)
+    return average
+
+def is_battery_safe():
+    abp = get_average_battery_percentage()
+    rtn = LOWER_THRESHOLD < abp < UPPER_THRESHOLD
+    return rtn
+
+def main():
+    pass
+    #TODO 多重起動防止処理を入れる
+    #TODO 通知条件に合致したら通知を出す
+
+if __name__ == '__main__':
+    main()
