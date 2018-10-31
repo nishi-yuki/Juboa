@@ -28,15 +28,15 @@ class UnkownValueError(Exception):
 def send_alart(massage):
     subprocess.call([
         "notify-send",
-        "-a", "BATNOTYFY",
-        "-u", "critical",
+        "--urgency=normal",
+        APP_NAME,
         massage,
     ])
 
 def send_warning_dialog(massage):
     subprocess.call([
         "zenity",
-        "--title=充電池通知",
+        "--title={}".format(APP_NAME),
         "--warning",
         "--no-wrap",
         "--text={}".format(massage),
