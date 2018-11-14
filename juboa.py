@@ -80,6 +80,12 @@ def is_battery_safe():
     rtn = LOWER_THRESHOLD < abp < UPPER_THRESHOLD
     return rtn
 
+def is_overcharge():
+    return get_average_battery_percentage() > UPPER_THRESHOLD
+
+def is_overdischarge():
+    return get_average_battery_percentage() < LOWER_THRESHOLD
+
 def main():
     pass
     #TODO 多重起動防止処理を入れる
