@@ -7,9 +7,11 @@
 #############################################################
 
 import subprocess
+import time
 
 UPPER_THRESHOLD = 80
 LOWER_THRESHOLD = 30
+SLEEP_SECS      = 20
 APP_NAME = "Juboa"
 AC_ADAPTER_PATH = "/org/freedesktop/UPower/devices/line_power_AC0"
 BATTERY_PATH_LIST = [
@@ -86,10 +88,16 @@ def is_overcharge():
 def is_overdischarge():
     return get_average_battery_percentage() < LOWER_THRESHOLD
 
+def main_loop():
+    if is_overcharge() and is_ac_adapter_online():
+        send_alart("過充電しています。電源コードを抜いてください。")
+
 def main():
-    pass
     #TODO 多重起動防止処理を入れる
     #TODO 通知条件に合致したら通知を出す
+    while True:
+        main_loop()
+        time.sleep(SLEEP_SECS)
 
 if __name__ == '__main__':
     main()
