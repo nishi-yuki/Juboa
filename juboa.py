@@ -3,11 +3,13 @@
 #                  充電しすぎを防ぐアプリ                    #
 #                          Juboa                             #
 # バッテリの過放電と過充電を警告するスクリプトです。実行する #
-# と常駐するので、バックグラウンドで起動してください。       #
+# と常駐します。                                             #
 ##############################################################
 
 import subprocess
 import time
+import os
+import sys
 
 UPPER_THRESHOLD = 80
 LOWER_THRESHOLD = 30
@@ -102,16 +104,25 @@ def is_overdischarge():
 
 
 def main_loop():
-    if is_overcharge() and is_ac_adapter_online():
-        send_alart("過充電しています。電源コードを抜いてください。")
+    while True:
+        # 通知条件に合致したら通知を出す
+        if is_overcharge() and is_ac_adapter_online():
+            send_alart("過充電しています。電源コードを抜いてください。")
+        time.sleep(SLEEP_SECS)
 
 
 def main():
     # TODO 多重起動防止処理を入れる
-    # TODO 通知条件に合致したら通知を出す
-    while True:
+    # バックグラウンドで常駐する
+    try:
+        pid = os.fork()
+    except OSError:
+        print("Juboaプロセスの起動に失敗しました")
+    if pid > 0:
+        print("Juboaプロセスが起動しました。\nPID:", pid)
+        sys.exit(0)
+    if pid == 0:
         main_loop()
-        time.sleep(SLEEP_SECS)
 
 
 if __name__ == '__main__':
