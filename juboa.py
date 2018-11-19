@@ -51,6 +51,20 @@ def send_warning_dialog(massage):
     ])
 
 
+def get_juboa_pid():
+    filename = os.path.basename(__file__)
+    try:
+        output = subprocess.check_output([
+            "pgrep",
+            "--full",
+            filename,
+        ])
+        pids = [int(p) for p in output.decode().split()]
+        return pids
+    except subprocess.CalledProcessError:
+        return []
+
+
 def get_upower_result(path):
     output = subprocess.check_output(["upower", "-i", path])
     return output.decode()
@@ -112,7 +126,16 @@ def main_loop():
 
 
 def main():
-    # TODO 多重起動防止処理を入れる
+    # 多重起動防止処理
+    my_pid = os.getpid()
+    pids = get_juboa_pid()
+    pids.remove(my_pid)
+    if len(pids) > 0:  # プロセスがすでにある場合
+        print("Juboaプロセスがすでに起動されています。")
+        for pid in pids:
+            print("PID:", pid)
+        sys.exit()  # -------------------------------->
+
     # バックグラウンドで常駐する
     try:
         pid = os.fork()
