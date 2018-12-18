@@ -32,7 +32,7 @@ class UnkownValueError(Exception):
     pass
 
 
-def send_alart(massage):
+def send_alert(massage):
     subprocess.call([
         "notify-send",
         "--urgency=normal",
@@ -121,7 +121,7 @@ def main_loop():
     while True:
         # 通知条件に合致したら通知を出す
         if is_overcharge() and is_ac_adapter_online():
-            send_alart("過充電しています。電源コードを抜いてください。")
+            send_alert("過充電しています。電源コードを抜いてください。")
         time.sleep(SLEEP_SECS)
 
 
@@ -132,6 +132,7 @@ def main():
     pids.remove(my_pid)
     if len(pids) > 0:  # プロセスがすでにある場合
         print("Juboaプロセスがすでに起動されています。")
+        send_alert("Juboaプロセスがすでに起動されています。")
         for pid in pids:
             print("PID:", pid)
         sys.exit()  # -------------------------------->
@@ -140,9 +141,14 @@ def main():
     try:
         pid = os.fork()
     except OSError:
-        print("Juboaプロセスの起動に失敗しました")
+        m = "Juboaプロセスの起動に失敗しました"
+        print(m)
+        send_alert(m)
     if pid > 0:
-        print("Juboaプロセスが起動しました。\nPID:", pid)
+        m = "Juboaプロセスが起動しました。\nPID: {}".format(pid)
+        print(m)
+        send_alert(m)
+        input("wait)")
         sys.exit(0)
     if pid == 0:
         main_loop()
