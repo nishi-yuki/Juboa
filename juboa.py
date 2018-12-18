@@ -126,10 +126,11 @@ def exit_if_juboa_exist():
     pids = get_juboa_pid()
     pids.remove(my_pid)
     if len(pids) > 0:  # プロセスがすでにある場合
-        print("Juboaプロセスがすでに起動されています。")
-        send_alert("Juboaプロセスがすでに起動されています。")
+        message="Juboaプロセスがすでに起動されています。"
         for pid in pids:
-            print("PID:", pid)
+            message += "\nPID: {}".format(pid)
+        print(message)
+        send_alert(message)
         sys.exit()  # -------------------------------->
 
 
@@ -143,7 +144,7 @@ def main_loop():
 
 def call_main_loop_background():
     """バックグラウンドで常駐する
-    
+
     ターミナルから呼び出されたときのための関数"""
     try:
         pid = os.fork()
