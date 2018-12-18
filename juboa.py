@@ -117,16 +117,11 @@ def is_overdischarge():
     return get_average_battery_percentage() < LOWER_THRESHOLD
 
 
-def main_loop():
-    while True:
-        # 通知条件に合致したら通知を出す
-        if is_overcharge() and is_ac_adapter_online():
-            send_alert("過充電しています。電源コードを抜いてください。")
-        time.sleep(SLEEP_SECS)
+def exit_if_juboa_exist():
+    """多重起動防止処理
 
-
-def main():
-    # 多重起動防止処理
+    すでに起動している同名のプロセスがあった場合、終了する
+    """
     my_pid = os.getpid()
     pids = get_juboa_pid()
     pids.remove(my_pid)
@@ -137,7 +132,19 @@ def main():
             print("PID:", pid)
         sys.exit()  # -------------------------------->
 
-    # バックグラウンドで常駐する
+
+def main_loop():
+    while True:
+        # 通知条件に合致したら通知を出す
+        if is_overcharge() and is_ac_adapter_online():
+            send_alert("過充電しています。電源コードを抜いてください。")
+        time.sleep(SLEEP_SECS)
+
+
+def call_main_loop_background():
+    """バックグラウンドで常駐する
+    
+    ターミナルから呼び出されたときのための関数"""
     try:
         pid = os.fork()
     except OSError:
@@ -156,10 +163,17 @@ def main():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("-v", "--version", help="バージョンを出力して終了します", action="store_true")
+    parser.add_argument("-v", "--version",
+                        help="バージョンを出力して終了します", action="store_true")
+    parser.add_argument("-l", "--mainloop",
+                        help="このプロセスでメインループを実行します", action="store_true")
     args = parser.parse_args()
     if args.version:
         print(__doc__, end="")
         exit(0)
+    elif args.mainloop:
+        exit_if_juboa_exist()
+        main_loop()
     else:
-        main()
+        exit_if_juboa_exist()
+        call_main_loop_background()
