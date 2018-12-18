@@ -1,15 +1,15 @@
 #! /usr/bin/env python3
-##############################################################
-#                  充電しすぎを防ぐアプリ                    #
-#                          Juboa                             #
-# バッテリの過放電と過充電を警告するスクリプトです。実行する #
-# と常駐します。                                             #
-##############################################################
+"""Juboa alpha 1.1
+バッテリの過放電と過充電を警告するスクリプトです
+実行すると常駐します
+ソースコード: https://github.com/nishi-yuki/Juboa
+"""
 
 import subprocess
 import time
 import os
 import sys
+import argparse
 
 UPPER_THRESHOLD = 80
 LOWER_THRESHOLD = 30
@@ -155,4 +155,11 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-v", "--version", help="バージョンを出力して終了します", action="store_true")
+    args = parser.parse_args()
+    if args.version:
+        print(__doc__, end="")
+        exit(0)
+    else:
+        main()
