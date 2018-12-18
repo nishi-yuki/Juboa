@@ -174,6 +174,7 @@ if __name__ == '__main__':
         exit(0)
     elif args.mainloop:
         exit_if_juboa_exist()
+        send_alert("Juboaプロセスが起動しました")
         main_loop()
     else:
         exit_if_juboa_exist()
